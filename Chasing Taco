@@ -1,0 +1,107 @@
+#Creator: Elizabeth De La O
+#I did this script during my learning process on Code in Place by Stanford University
+#I hope you like it and play it.
+
+# Run this website to play: https://codeinplace.stanford.edu/cip3/share/LKrWPQTQRt56Nrt5mxUn
+#script below:
+
+from graphics import Canvas
+import time
+import random
+    
+CANVAS_WIDTH = 400
+CANVAS_HEIGHT = 400
+SIZE = 20
+
+# if you make this larger, the game will go slower
+DELAY = 0.1
+
+
+
+def main():
+    canvas = Canvas(CANVAS_WIDTH, CANVAS_HEIGHT)
+    dx = 0
+    dy = 0
+    
+    # Create player
+    
+    player = canvas.create_image_with_size(0, 0, 20, 20, 'PacMan.png')
+    
+    # Create the taco
+    goal_x = 360
+    goal_y = 360
+    #taco = canvas.create_rectangle(goal_x, goal_y, goal_x + SIZE, goal_y + SIZE,"salmon")
+    taco = canvas.create_image_with_size(goal_x, goal_y, 20, 20, 'taco.png')
+    
+    
+    direction = 'Right'
+    count = 0
+
+    
+    while True:
+        # Handle Key Press
+        key = canvas.get_last_key_press()
+        if key == 'ArrowLeft':
+            direction = 'Left'
+        elif key == 'ArrowRight':
+            direction = 'Right'
+        elif key == 'ArrowUp':
+            direction = 'Up'
+        elif key == 'ArrowDown':
+            direction = 'Down'
+        
+        # Update the player's position
+        if direction == 'Left':
+            dx -= SIZE
+        elif direction == 'Right':
+            dx += SIZE
+        elif direction == 'Up':
+            dy-= SIZE
+        else:  # direction == 'Down'
+            dy += SIZE
+        
+        # change player possition
+        canvas.moveto(player, dx, dy)
+        
+        # Check for out of bounds
+        player_x = canvas.get_left_x(player)
+        player_y = canvas.get_top_y(player)
+        if player_x < 0 or player_x >= CANVAS_WIDTH or player_y < 0 or player_y >= CANVAS_HEIGHT:
+            break
+            
+        
+        # Detecting collisions
+        goal_x = canvas.get_left_x(taco)
+        goal_y = canvas.get_top_y(taco)
+        goal_right = goal_x + SIZE
+        goal_bottom = goal_y + SIZE
+        
+        if player_x < goal_right and player_x + SIZE > goal_x and player_y < goal_bottom and player_y + SIZE > goal_y:
+            move_taco(canvas, taco)
+            count += 1
+            
+        
+        # print points
+        text_obj = canvas.create_text(187, 387,text=f"{count} points")
+        
+        # Sleep    
+        time.sleep(DELAY)
+        
+        # Delete old points text
+        canvas.delete(text_obj)
+        canvas.delete('taco.png')
+        
+    # show result
+    result = f"Total Score : {str(count)}"
+    canvas.create_text((CANVAS_WIDTH/2)-90, CANVAS_HEIGHT/2-30, 'Game Over',  font_size = 35, color='magenta')
+    canvas.create_text((CANVAS_WIDTH/2)-50, (CANVAS_HEIGHT/2)+15, result, font_size = 15, color='blue')
+    
+# Move the taco to a new location
+def move_taco(canvas, taco):
+    goal_x = random.randint(0, CANVAS_WIDTH // SIZE - 1) * SIZE
+    goal_y = random.randint(0, CANVAS_HEIGHT // SIZE - 1) * SIZE
+    canvas.moveto(taco, goal_x, goal_y)
+
+
+if __name__ == '__main__':
+    main()
